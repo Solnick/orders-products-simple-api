@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Article } from './article';
 import { ArticleDto } from './article.dto';
 
@@ -6,6 +10,13 @@ import { ArticleDto } from './article.dto';
 export class ArticlesService {
   private nextCreatedArticleId = 1;
   private articles: Article[] = [];
+
+  private isTitleAvailable(title: string) {
+    const matchingArticle = this.articles.find(
+      (article) => article.title === title,
+    );
+    return matchingArticle === undefined;
+  }
 
   getAll() {
     return this.articles;
@@ -26,6 +37,9 @@ export class ArticlesService {
     if (articleIndex === -1) {
       throw new NotFoundException();
     }
+    if (!this.isTitleAvailable(article.title)) {
+      throw new ConflictException('Article with this title already exists');
+    }
     this.articles[articleIndex] = {
       ...this.articles[articleIndex],
       title: article.title,
@@ -35,6 +49,9 @@ export class ArticlesService {
   }
 
   create(article: ArticleDto) {
+    if (!this.isTitleAvailable(article.title)) {
+      throw new ConflictException('Article with this title already exists');
+    }
     const newArticle: Article = {
       id: this.nextCreatedArticleId++,
       title: article.title,
