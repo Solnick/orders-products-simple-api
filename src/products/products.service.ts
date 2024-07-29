@@ -17,7 +17,7 @@ export class ProductsService {
   ) {}
 
   private isNameAvailable(name: string, idToIgnore?: string) {
-    const matchingProduct = this.database.data.products.find((product) => {
+    const matchingProduct = this.getAll().find((product) => {
       return product.name === name && product.id !== idToIgnore;
     });
     return matchingProduct === undefined;
@@ -30,7 +30,7 @@ export class ProductsService {
   }
 
   getAll() {
-    return this.database.data.products;
+    return this.database.data.products.filter(({ isDeleted }) => !isDeleted);
   }
 
   getById(id: string) {
@@ -51,6 +51,9 @@ export class ProductsService {
       throw new NotFoundException();
     }
     const originalProduct = this.database.data.products[productIndex];
+    if (originalProduct.isDeleted) {
+      throw new NotFoundException();
+    }
     if (!this.isNameAvailable(product.name, id)) {
       throw new ConflictException('Product with this name already exists');
     }
@@ -71,6 +74,7 @@ export class ProductsService {
       id: uuid(),
       name: product.name,
       priceInEUR: product.priceInEUR,
+      isDeleted: false,
     };
     this.database.data.products.push(newProduct);
     await this.database.write();
@@ -84,7 +88,15 @@ export class ProductsService {
     if (productIndex === -1) {
       throw new NotFoundException();
     }
-    this.database.data.products.splice(productIndex, 1);
+    const originalProduct = this.database.data.products[productIndex];
+    if (originalProduct.isDeleted) {
+      throw new NotFoundException();
+    }
+    this.database.data.products[productIndex] = {
+      ...originalProduct,
+      isDeleted: true,
+    };
     await this.database.write();
+    return this.database.data.products[productIndex];
   }
 }
