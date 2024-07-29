@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Simple API for managing articles')
+    .setTitle('Simple API for managing orders')
     .setVersion('1.0')
     .build();
 
