@@ -3,10 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  Param, Patch,
+  Param,
+  Patch,
   Post,
-  Put
-} from "@nestjs/common";
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductDto } from './product.dto';
 

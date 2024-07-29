@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { Order, OrderedProduct, Status } from './orders';
 import { CreateOrderDto, UpdateOrderDto } from './order.dto';

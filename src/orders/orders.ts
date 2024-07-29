@@ -1,5 +1,3 @@
-import { IsString } from "class-validator";
-
 export enum Status {
   InProgress = 'InProgress',
   Delivery = 'Delivery',
